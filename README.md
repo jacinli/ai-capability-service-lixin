@@ -107,7 +107,7 @@ Swagger 调试说明：
 - `/docs` 已声明 Bearer Token 安全方案
 - 打开文档后，右上角会出现 `Authorize` 按钮
 - 点击后填入：
-  `ea8a832b-a5e9-4c66-96e9-aa4ad013cb33`
+
 - Swagger UI 会自动带上 `Authorization: Bearer ...`
 
 ## curl Examples
