@@ -4,7 +4,7 @@ import json
 import logging
 import uuid
 
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
@@ -15,7 +15,7 @@ from app.llm import resolve_model_name
 from app.models.schemas import ErrorDetail, ErrorResponse, MetaBlock
 from app.routers.chat_stream import router as chat_stream_router
 from app.routers.capabilities import router as capabilities_router
-from app.security import is_authorized, is_public_path, unauthorized_response
+from app.security import document_bearer_scheme, is_authorized, is_public_path, unauthorized_response
 
 
 class JsonFormatter(logging.Formatter):
@@ -79,7 +79,7 @@ async def auth_middleware(request: Request, call_next):
     return unauthorized_response(request.url.path)
 
 
-@app.get("/health")
+@app.get("/health", dependencies=[Depends(document_bearer_scheme)])
 async def health() -> dict[str, str]:
     """健康检查接口。"""
 

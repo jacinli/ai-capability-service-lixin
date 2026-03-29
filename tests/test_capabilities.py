@@ -114,6 +114,13 @@ async def test_chat_stream_requires_user_message(client) -> None:
     assert "INPUT_ERROR" in text
 
 
+async def test_openapi_has_bearer_security(client) -> None:
+    response = await client.get("/openapi.json")
+    body = response.json()
+    assert "HTTPBearer" in body["components"]["securitySchemes"]
+    assert body["paths"]["/v1/capabilities/run"]["post"]["security"]
+
+
 def _summary_payload(text: str | None = None, max_length: int = 120, request_id: str = "summary-1") -> dict:
     source = text if text is not None else (
         "人工智能系统可以通过统一的能力接口完成摘要、分类和情感分析，"

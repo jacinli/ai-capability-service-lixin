@@ -3,6 +3,8 @@
 本地基础地址：`http://localhost:37612`  
 FastAPI 文档：`http://localhost:37612/docs`
 
+Swagger UI 支持 Bearer Token 调试。打开 `/docs` 后使用右上角 `Authorize`，填入 `.env` 中的 `API_BEARER_TOKEN` 即可。
+
 ## POST /v1/capabilities/run
 
 统一能力调用接口。

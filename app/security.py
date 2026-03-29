@@ -2,14 +2,16 @@
 
 import uuid
 
-from fastapi import Request
+from fastapi import Request, Security
 from fastapi.responses import JSONResponse
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.config import settings
 from app.llm import resolve_model_name
 from app.models.schemas import ErrorDetail, ErrorResponse, MetaBlock
 
 PUBLIC_PATHS = {"/docs", "/openapi.json", "/redoc", "/favicon.ico"}
+http_bearer = HTTPBearer(auto_error=False)
 
 
 def is_public_path(path: str) -> bool:
@@ -42,3 +44,9 @@ def unauthorized_response(path: str) -> JSONResponse:
         meta=meta,
     )
     return JSONResponse(status_code=401, content=body.model_dump())
+
+
+async def document_bearer_scheme(
+    _: HTTPAuthorizationCredentials | None = Security(http_bearer),
+) -> None:
+    """仅用于在 OpenAPI 中声明 Bearer 认证。"""

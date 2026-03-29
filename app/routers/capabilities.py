@@ -4,7 +4,7 @@ import json
 import logging
 import time
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
 from app.capabilities.registry import registry
@@ -17,8 +17,13 @@ from app.models.schemas import (
     MetaBlock,
     SuccessResponse,
 )
+from app.security import document_bearer_scheme
 
-router = APIRouter(prefix="/v1/capabilities", tags=["capabilities"])
+router = APIRouter(
+    prefix="/v1/capabilities",
+    tags=["capabilities"],
+    dependencies=[Depends(document_bearer_scheme)],
+)
 logger = logging.getLogger(__name__)
 
 

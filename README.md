@@ -57,11 +57,58 @@ uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 37612
 使用 Docker Compose：
 
 ```bash
-docker compose up --build -d
+docker compose pull
+docker compose up -d
 ```
+
+Nginx 反代示例：
+
+项目已提供可直接参考的 Nginx 配置文件：
+
+- [ai-capability-service-lixin.conf](/Users/jacinlee/selfwork/job/self-proj/ai-capability-service-lixin/deploy/nginx/ai-capability-service-lixin.conf)
+
+这份配置已经包含：
+
+- HTTPS 终止
+- 反向代理到 `127.0.0.1:37612`
+- SSE 所需的 `proxy_buffering off`
+- 适用于 `chat/stream` 的长连接超时设置
 
 服务地址：`http://localhost:37612`  
 接口文档：`http://localhost:37612/docs`
+
+## API Overview
+
+当前对外接口如下：
+
+- `GET /health`
+  - 健康检查
+- `POST /v1/capabilities/run`
+  - 同步能力调用
+- `POST /v1/capabilities/chat/stream`
+  - 流式对话，返回 `text/event-stream`
+
+除 `/docs`、`/openapi.json`、`/redoc` 外，所有请求都需要：
+
+```http
+Authorization: Bearer <API_BEARER_TOKEN>
+```
+
+统一响应包说明：
+
+- 同步成功：`{ ok, data, meta }`
+- 同步失败：`{ ok, error, meta }`
+- `meta` 固定包含：`request_id`、`capability`、`model`、`elapsed_ms`
+
+更详细的字段定义、错误码和 SSE 事件说明见 [docs/api.md](/Users/jacinlee/selfwork/job/self-proj/ai-capability-service-lixin/docs/api.md)。
+
+Swagger 调试说明：
+
+- `/docs` 已声明 Bearer Token 安全方案
+- 打开文档后，右上角会出现 `Authorize` 按钮
+- 点击后填入：
+  `ea8a832b-a5e9-4c66-96e9-aa4ad013cb33`
+- Swagger UI 会自动带上 `Authorization: Bearer ...`
 
 ## curl Examples
 
@@ -164,6 +211,9 @@ ai-capability-service-lixin/
 │   ├── architecture.md
 │   └── api.md
 ├── agents/
+├── deploy/
+│   └── nginx/
+│       └── ai-capability-service-lixin.conf
 ├── .env.example
 ├── pyproject.toml
 ├── uv.lock
@@ -171,6 +221,14 @@ ai-capability-service-lixin/
 ├── docker-compose.yml
 └── README.md
 ```
+
+目录说明：
+
+- `app/`：服务主代码，包含配置、能力处理器、路由和鉴权
+- `tests/`：最小测试集，覆盖同步能力、鉴权和流式接口
+- `docs/`：架构说明与详细接口文档
+- `agents/`：给 AI Coding Agent 的规则和技能说明
+- `.github/workflows/`：CI/CD 和 Docker 镜像构建流程
 
 ## Adding a New Capability
 

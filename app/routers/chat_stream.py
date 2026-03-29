@@ -5,15 +5,20 @@ import logging
 import time
 from collections.abc import AsyncIterator
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 
 from app.capabilities.chat_stream import chat_stream_service
 from app.capabilities.text_summary import ModelError
 from app.llm import resolve_model_name
 from app.models.schemas import ChatStreamRequest
+from app.security import document_bearer_scheme
 
-router = APIRouter(prefix="/v1/capabilities", tags=["capabilities"])
+router = APIRouter(
+    prefix="/v1/capabilities",
+    tags=["capabilities"],
+    dependencies=[Depends(document_bearer_scheme)],
+)
 logger = logging.getLogger(__name__)
 
 
