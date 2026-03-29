@@ -123,3 +123,36 @@ curl -X POST http://localhost:37612/v1/capabilities/run \
 ```bash
 curl -H "Authorization: Bearer <API_BEARER_TOKEN>" http://localhost:37612/health
 ```
+
+## POST /v1/capabilities/chat/stream
+
+流式对话接口，返回 `text/event-stream`。
+
+请求体：
+
+| 字段 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `messages` | array | 是 | 对话消息列表，元素包含 `role` 与 `content` |
+| `model` | string | 否 | 本次流式对话使用的模型；不传时默认 `qwen-plus-latest` |
+| `request_id` | string | 否 | 调用链跟踪 ID，不传则自动生成 |
+
+示例：
+
+```bash
+curl -N -X POST http://localhost:37612/v1/capabilities/chat/stream \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <API_BEARER_TOKEN>" \
+  -d '{
+    "messages": [
+      {"role": "system", "content": "你是一个简洁的中文助手。"},
+      {"role": "user", "content": "请介绍这个服务。"}
+    ]
+  }'
+```
+
+SSE 事件：
+
+- `meta`
+- `chunk`
+- `done`
+- `error`

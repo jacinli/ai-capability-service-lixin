@@ -96,6 +96,24 @@ async def test_request_model_override(client) -> None:
     assert response.json()["meta"]["model"] == "qwen-plus-latest"
 
 
+async def test_chat_stream_success(client) -> None:
+    async with client.stream("POST", "/v1/capabilities/chat/stream", json=_chat_payload()) as response:
+        text = "".join([chunk async for chunk in response.aiter_text()])
+    assert response.status_code == 200
+    assert "event: meta" in text
+    assert "event: chunk" in text
+    assert "event: done" in text
+
+
+async def test_chat_stream_requires_user_message(client) -> None:
+    payload = {"messages": [{"role": "system", "content": "only system"}]}
+    async with client.stream("POST", "/v1/capabilities/chat/stream", json=payload) as response:
+        text = "".join([chunk async for chunk in response.aiter_text()])
+    assert response.status_code == 200
+    assert "event: error" in text
+    assert "INPUT_ERROR" in text
+
+
 def _summary_payload(text: str | None = None, max_length: int = 120, request_id: str = "summary-1") -> dict:
     source = text if text is not None else (
         "人工智能系统可以通过统一的能力接口完成摘要、分类和情感分析，"
@@ -110,3 +128,13 @@ def _summary_payload(text: str | None = None, max_length: int = 120, request_id:
 
 def _sentiment_payload(text: str) -> dict:
     return {"capability": "sentiment_analysis", "input": {"text": text}}
+
+
+def _chat_payload() -> dict:
+    return {
+        "model": "qwen-plus-latest",
+        "messages": [
+            {"role": "system", "content": "你是一个简洁的中文助手。"},
+            {"role": "user", "content": "请介绍这个服务。"},
+        ],
+    }

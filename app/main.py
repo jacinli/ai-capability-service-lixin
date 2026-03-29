@@ -13,6 +13,7 @@ import app.capabilities.text_summary  # noqa: F401
 from app.config import settings
 from app.llm import resolve_model_name
 from app.models.schemas import ErrorDetail, ErrorResponse, MetaBlock
+from app.routers.chat_stream import router as chat_stream_router
 from app.routers.capabilities import router as capabilities_router
 from app.security import is_authorized, is_public_path, unauthorized_response
 
@@ -52,6 +53,7 @@ def configure_logging() -> None:
 configure_logging()
 app = FastAPI(title="AI 能力统一调用服务", version="1.0.0")
 app.include_router(capabilities_router)
+app.include_router(chat_stream_router)
 logger = logging.getLogger(__name__)
 
 

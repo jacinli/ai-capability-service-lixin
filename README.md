@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-这是一个最小但可交付的模型能力统一调用后端服务，基于 FastAPI 提供 `POST /v1/capabilities/run`，当前内置 `text_summary` 与 `sentiment_analysis` 两个能力；服务使用 `uv` 管理依赖与虚拟环境，支持 OpenAI、豆包、DeepSeek、智谱、通义千问等 OpenAI 兼容供应商，并为全部 API 增加 Bearer Token 鉴权。`request_id` 仅用于链路追踪，不表示模型；模型通过独立的 `model` 字段指定。
+这是一个最小但可交付的模型能力统一调用后端服务，基于 FastAPI 提供 `POST /v1/capabilities/run` 和 `POST /v1/capabilities/chat/stream`。当前内置 `text_summary`、`sentiment_analysis`，并额外提供流式对话能力；服务使用 `uv` 管理依赖与虚拟环境，支持 OpenAI、豆包、DeepSeek、智谱、通义千问等 OpenAI 兼容供应商，并为全部 API 增加 Bearer Token 鉴权。`request_id` 仅用于链路追踪，不表示模型；模型通过独立的 `model` 字段指定。
 
 ## Tech Stack
 
@@ -95,6 +95,28 @@ curl -X POST http://localhost:37612/v1/capabilities/run \
   }'
 ```
 
+`chat_stream`：
+
+```bash
+curl -N -X POST http://localhost:37612/v1/capabilities/chat/stream \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <你的 API_BEARER_TOKEN>" \
+  -d '{
+    "model": "qwen-plus-latest",
+    "messages": [
+      {"role": "system", "content": "你是一个简洁的中文助手。"},
+      {"role": "user", "content": "请用三句话介绍这个服务。"}
+    ]
+  }'
+```
+
+流式接口返回 `text/event-stream`，事件类型包括：
+
+- `meta`：请求元信息
+- `chunk`：逐段返回的文本内容
+- `done`：流结束与耗时
+- `error`：流式处理中的错误
+
 错误示例：
 
 ```bash
@@ -126,12 +148,14 @@ ai-capability-service-lixin/
 │   ├── capabilities/
 │   │   ├── __init__.py
 │   │   ├── base.py
+│   │   ├── chat_stream.py
 │   │   ├── registry.py
 │   │   ├── text_summary.py
 │   │   └── sentiment_analysis.py
 │   └── routers/
 │       ├── __init__.py
-│       └── capabilities.py
+│       ├── capabilities.py
+│       └── chat_stream.py
 ├── tests/
 │   ├── __init__.py
 │   ├── conftest.py

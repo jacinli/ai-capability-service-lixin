@@ -17,6 +17,25 @@ class CapabilityRequest(BaseModel):
     request_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
 
 
+class ChatMessage(BaseModel):
+    """对话消息。"""
+
+    model_config = ConfigDict(extra="forbid")
+
+    role: str
+    content: str
+
+
+class ChatStreamRequest(BaseModel):
+    """流式对话请求。"""
+
+    model_config = ConfigDict(extra="forbid")
+
+    messages: list[ChatMessage]
+    model: str | None = None
+    request_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+
+
 class MetaBlock(BaseModel):
     """统一元信息。"""
 
