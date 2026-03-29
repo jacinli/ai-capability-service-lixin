@@ -10,5 +10,5 @@ class CapabilityHandler(ABC):
     name: str
 
     @abstractmethod
-    async def run(self, input: dict[str, Any]) -> str:
+    async def run(self, input: dict[str, Any], model: str) -> str:
         """执行能力处理逻辑并返回字符串结果。"""

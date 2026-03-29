@@ -19,6 +19,7 @@ Authorization: Bearer <API_BEARER_TOKEN>
 |---|---|---|---|
 | `capability` | string | 是 | 要调用的能力名称 |
 | `input` | object | 是 | 能力输入参数 |
+| `model` | string | 否 | 指定本次调用使用的模型；不传时默认 `qwen-plus-latest` |
 | `request_id` | string | 否 | 调用链跟踪 ID，不传则自动生成 |
 
 ### 成功响应
@@ -32,6 +33,7 @@ Authorization: Bearer <API_BEARER_TOKEN>
   "meta": {
     "request_id": "demo-001",
     "capability": "text_summary",
+    "model": "qwen-plus-latest",
     "elapsed_ms": 8
   }
 }
@@ -50,6 +52,7 @@ Authorization: Bearer <API_BEARER_TOKEN>
   "meta": {
     "request_id": "demo-001",
     "capability": "text_summary",
+    "model": "qwen-plus-latest",
     "elapsed_ms": 2
   }
 }

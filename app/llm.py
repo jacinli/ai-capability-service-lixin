@@ -59,6 +59,17 @@ def get_active_provider() -> LLMProvider | None:
     return provider
 
 
+def resolve_model_name(requested_model: str | None = None) -> str:
+    """解析当前请求最终使用的模型名。"""
+
+    if requested_model:
+        return requested_model
+    provider = get_active_provider()
+    if provider is not None and provider.model:
+        return provider.model
+    return settings.qwen_model
+
+
 def build_openai_client() -> AsyncOpenAI:
     """构建当前激活供应商对应的客户端。"""
 

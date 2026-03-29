@@ -1,6 +1,7 @@
 """接口测试。"""
 
 import json
+import uuid
 
 
 async def test_health(client) -> None:
@@ -69,11 +70,30 @@ async def test_custom_request_id(client) -> None:
     assert response.json()["meta"]["request_id"] == "req-123"
 
 
+async def test_missing_request_id_generates_uuid(client) -> None:
+    payload = _summary_payload()
+    payload.pop("request_id")
+    response = await client.post("/v1/capabilities/run", json=payload)
+    uuid.UUID(response.json()["meta"]["request_id"])
+
+
 async def test_missing_bearer_token_rejected(client) -> None:
     client.headers.pop("Authorization")
     response = await client.get("/health")
     assert response.status_code == 401
     assert response.json()["error"]["code"] == "UNAUTHORIZED"
+
+
+async def test_response_has_model_meta(client) -> None:
+    response = await client.post("/v1/capabilities/run", json=_summary_payload())
+    assert response.json()["meta"]["model"] == "qwen-plus-latest"
+
+
+async def test_request_model_override(client) -> None:
+    payload = _summary_payload()
+    payload["model"] = "qwen-plus-latest"
+    response = await client.post("/v1/capabilities/run", json=payload)
+    assert response.json()["meta"]["model"] == "qwen-plus-latest"
 
 
 def _summary_payload(text: str | None = None, max_length: int = 120, request_id: str = "summary-1") -> dict:

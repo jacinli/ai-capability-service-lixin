@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-这是一个最小但可交付的模型能力统一调用后端服务，基于 FastAPI 提供 `POST /v1/capabilities/run`，当前内置 `text_summary` 与 `sentiment_analysis` 两个能力；服务使用 `uv` 管理依赖与虚拟环境，支持 OpenAI、豆包、DeepSeek、智谱、通义千问等 OpenAI 兼容供应商，并为全部 API 增加 Bearer Token 鉴权。
+这是一个最小但可交付的模型能力统一调用后端服务，基于 FastAPI 提供 `POST /v1/capabilities/run`，当前内置 `text_summary` 与 `sentiment_analysis` 两个能力；服务使用 `uv` 管理依赖与虚拟环境，支持 OpenAI、豆包、DeepSeek、智谱、通义千问等 OpenAI 兼容供应商，并为全部 API 增加 Bearer Token 鉴权。`request_id` 仅用于链路追踪，不表示模型；模型通过独立的 `model` 字段指定。
 
 ## Tech Stack
 
@@ -39,6 +39,7 @@ cp .env.example .env
 - 对应的 `*_API_KEY`、`*_API_BASE`、`*_MODEL` 都从 `.env` 读取
 - 不要提交真实 `.env` 文件
 - 未配置可用 key 时，服务自动回退为 mock 模式
+- 如果请求里不传 `model`，后端默认使用 `qwen-plus-latest`
 - 当前默认模板使用：`qwen-plus-latest`、`deepseek-chat`、`doubao-seed-1-8-251228`
 
 本地运行：

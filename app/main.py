@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse
 import app.capabilities.sentiment_analysis  # noqa: F401
 import app.capabilities.text_summary  # noqa: F401
 from app.config import settings
+from app.llm import resolve_model_name
 from app.models.schemas import ErrorDetail, ErrorResponse, MetaBlock
 from app.routers.capabilities import router as capabilities_router
 from app.security import is_authorized, is_public_path, unauthorized_response
@@ -57,7 +58,12 @@ logger = logging.getLogger(__name__)
 def _error_response(request_id: str, capability: str, code: str, message: str) -> JSONResponse:
     """构建统一错误响应。"""
 
-    meta = MetaBlock(request_id=request_id, capability=capability, elapsed_ms=0)
+    meta = MetaBlock(
+        request_id=request_id,
+        capability=capability,
+        model=resolve_model_name(),
+        elapsed_ms=0,
+    )
     body = ErrorResponse(error=ErrorDetail(code=code, message=message), meta=meta)
     return JSONResponse(status_code=500 if code == "INTERNAL_ERROR" else 422, content=body.model_dump())
 
@@ -85,7 +91,12 @@ async def validation_exception_handler(_: Request, exc: RequestValidationError) 
     request_id = str(uuid.uuid4())
     message = "请求体校验失败。"
     details = {"errors": exc.errors()}
-    meta = MetaBlock(request_id=request_id, capability="unknown", elapsed_ms=0)
+    meta = MetaBlock(
+        request_id=request_id,
+        capability="unknown",
+        model=resolve_model_name(),
+        elapsed_ms=0,
+    )
     body = ErrorResponse(
         error=ErrorDetail(code="VALIDATION_ERROR", message=message, details=details),
         meta=meta,

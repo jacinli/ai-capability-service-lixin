@@ -18,7 +18,7 @@ class TextSummaryHandler(CapabilityHandler):
 
     name = "text_summary"
 
-    async def run(self, input: dict[str, Any]) -> str:
+    async def run(self, input: dict[str, Any], model: str) -> str:
         """摘要输入文本并返回结果。"""
 
         text = self._validate_text(input.get("text"))
@@ -29,7 +29,7 @@ class TextSummaryHandler(CapabilityHandler):
         try:
             client = build_openai_client()
             response = await client.chat.completions.create(
-                model=provider.model,
+                model=model,
                 messages=[
                     {
                         "role": "system",

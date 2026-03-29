@@ -6,6 +6,7 @@ from fastapi import Request
 from fastapi.responses import JSONResponse
 
 from app.config import settings
+from app.llm import resolve_model_name
 from app.models.schemas import ErrorDetail, ErrorResponse, MetaBlock
 
 PUBLIC_PATHS = {"/docs", "/openapi.json", "/redoc", "/favicon.ico"}
@@ -30,7 +31,12 @@ def is_authorized(request: Request) -> bool:
 def unauthorized_response(path: str) -> JSONResponse:
     """返回统一未授权响应。"""
 
-    meta = MetaBlock(request_id=str(uuid.uuid4()), capability=path, elapsed_ms=0)
+    meta = MetaBlock(
+        request_id=str(uuid.uuid4()),
+        capability=path,
+        model=resolve_model_name(),
+        elapsed_ms=0,
+    )
     body = ErrorResponse(
         error=ErrorDetail(code="UNAUTHORIZED", message="缺少有效的 Bearer Token。"),
         meta=meta,

@@ -39,7 +39,7 @@ class SentimentAnalysisHandler(CapabilityHandler):
 
     name = "sentiment_analysis"
 
-    async def run(self, input: dict[str, Any]) -> str:
+    async def run(self, input: dict[str, Any], model: str) -> str:
         """分析输入文本情感并返回 JSON 字符串。"""
 
         text = self._validate_text(input.get("text"))
@@ -49,7 +49,7 @@ class SentimentAnalysisHandler(CapabilityHandler):
         try:
             client = build_openai_client()
             response = await client.chat.completions.create(
-                model=provider.model,
+                model=model,
                 response_format={"type": "json_object"},
                 messages=[
                     {
