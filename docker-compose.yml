@@ -1,0 +1,9 @@
+services:
+  ai-capability-service:
+    image: ghcr.io/jacinli/ai-capability-service-lixin:latest
+    container_name: ai-capability-service
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "37612:37612"
